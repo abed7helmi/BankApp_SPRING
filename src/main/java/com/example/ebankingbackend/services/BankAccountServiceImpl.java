@@ -43,7 +43,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public CurrentAccount saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException {
-        log.info("-----------saveBankAccount");
+        log.info("-----------saveCurrentBankAccount");
         BankAccount bankAccount;
         Customer customer = customerRepository.findById(customerId).orElse(null);
         if (customer == null) {
@@ -64,7 +64,23 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public SavingAccount saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException {
-        return null;
+        log.info("-----------saveSavingBankAccount");
+        BankAccount bankAccount;
+        Customer customer = customerRepository.findById(customerId).orElse(null);
+        if (customer == null) {
+            throw new CustomerNotFoundException("Customer not found");
+        }
+        SavingAccount savingAccount = new SavingAccount();
+
+        savingAccount.setId(UUID.randomUUID().toString());
+        savingAccount.setBalance(initialBalance);
+        savingAccount.setCreatedAt(new Date());
+        savingAccount.setCustomer(customer);
+        savingAccount.setInterestRate(interestRate);
+
+        SavingAccount savedBankAccount = bankAccountRepository.save(savingAccount);
+
+        return savedBankAccount;
     }
 
 

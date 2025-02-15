@@ -114,16 +114,31 @@ public class BankAccountServiceImpl implements BankAccountService {
 
         accountOperationRepository.save(accountOperation);
         bankAccount.setBalance(bankAccount.getBalance() - amount);
+        bankAccountRepository.save(bankAccount);
 
     }
 
     @Override
-    public void credit(String accountId, double amount, String description) {
+    public void credit(String accountId, double amount, String description) throws BankAccountNotFoundException {
+        BankAccount bankAccount = this.getBankAccount(accountId);
+
+        AccountOperation accountOperation = new AccountOperation();
+        accountOperation.setType(OperationType.CREDIT);
+        accountOperation.setAmount(amount);
+        accountOperation.setDescription(description);
+        accountOperation.setOperationDate(new Date());
+        accountOperation.setBankAccount(bankAccount);
+
+        accountOperationRepository.save(accountOperation);
+        bankAccount.setBalance(bankAccount.getBalance() + amount);
+        bankAccountRepository.save(bankAccount);
 
     }
 
     @Override
-    public void transfer(String accountIdSource, String accountIdDestination, double amount) {
+    public void transfer(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, BalanceNotSufficentException {
+        this.debit(accountIdSource,amount,"Transfer to "+accountIdDestination);
+        this.credit(accountIdDestination,amount,"Transfer from "+accountIdSource);
 
     }
 }

@@ -1,9 +1,9 @@
 package com.example.ebankingbackend.services;
 
-import com.example.ebankingbackend.entities.BankAccount;
-import com.example.ebankingbackend.entities.CurrentAccount;
-import com.example.ebankingbackend.entities.Customer;
-import com.example.ebankingbackend.entities.SavingAccount;
+import com.example.ebankingbackend.entities.*;
+import com.example.ebankingbackend.enums.OperationType;
+import com.example.ebankingbackend.exceptions.BalanceNotSufficentException;
+import com.example.ebankingbackend.exceptions.BankAccountNotFoundException;
 import com.example.ebankingbackend.exceptions.CustomerNotFoundException;
 import com.example.ebankingbackend.repositories.AccountOperationRepository;
 import com.example.ebankingbackend.repositories.BankAccountRepository;
@@ -85,17 +85,35 @@ public class BankAccountServiceImpl implements BankAccountService {
 
 
     @Override
-    public BankAccount getAllBankAccount() {
-        return null;
+    public BankAccount getBankAccount(String id) throws BankAccountNotFoundException {
+
+        BankAccount bankAccount= bankAccountRepository.findById(id).orElseThrow(() -> new BankAccountNotFoundException("Bank Account Not Found"));
+        return bankAccount;
+
+
     }
 
     @Override
     public List<Customer> listCustomers() {
-        return List.of();
+        return customerRepository.findAll();
     }
 
     @Override
-    public void debit(String accountId, double amount, String description) {
+    public void debit(String accountId, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficentException {
+        BankAccount bankAccount = this.getBankAccount(accountId);
+        if(bankAccount.getBalance() < amount) {
+            throw new BalanceNotSufficentException("Balance not sufficent");
+        }
+
+        AccountOperation accountOperation = new AccountOperation();
+        accountOperation.setType(OperationType.DEBIT);
+        accountOperation.setAmount(amount);
+        accountOperation.setDescription(description);
+        accountOperation.setOperationDate(new Date());
+        accountOperation.setBankAccount(bankAccount);
+
+        accountOperationRepository.save(accountOperation);
+        bankAccount.setBalance(bankAccount.getBalance() - amount);
 
     }
 

@@ -109,6 +109,13 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
+    public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer Not found"));
+        return bankAccountMapper.fromCustomer(customer);
+    }
+
+    @Override
     public void debit(String accountId, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficentException {
         BankAccount bankAccount = this.getBankAccount(accountId);
         if(bankAccount.getBalance() < amount) {

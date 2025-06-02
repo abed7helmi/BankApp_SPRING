@@ -29,10 +29,6 @@ public class EBankingBackEndApplication {
 
 
 
-
-
-
-
     @Bean
     CommandLineRunner start(CustomerRepository customerRepository,
                             BankAccountRepository bankAccountRepository,

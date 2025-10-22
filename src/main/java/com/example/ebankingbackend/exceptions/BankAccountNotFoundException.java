@@ -1,6 +1,8 @@
 package com.example.ebankingbackend.exceptions;
 
-public class BankAccountNotFoundException extends Exception {
+import jakarta.persistence.EntityNotFoundException;
+
+public class BankAccountNotFoundException extends EntityNotFoundException {
     public BankAccountNotFoundException(String message) {
         super(message);
     }
